@@ -9,7 +9,7 @@ if sys.hexversion < 0x3020000:
 
 setup(
     name='MutPy',
-    version='0.4.0',
+    version='0.4.0-1',
     description='Mutation testing tool for Python 3.x source code.',
     author='Konrad Hałas',
     author_email='halas.konrad@gmail.com',
@@ -17,6 +17,7 @@ setup(
     download_url='https://bitbucket.org/khalas/mutpy',
     packages=['mutpy'],
     scripts=['bin/mut.py'],
+    package_data={'mutpy': ['templates/*.html']},
     install_requires=['PyYAML>=3.1', 'Jinja2>=2.7.1'],
     test_suite='mutpy.test',
     classifiers=[
