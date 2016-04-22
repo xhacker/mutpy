@@ -161,7 +161,7 @@ class AbstractSourceGenerator(ast.NodeVisitor):
             self.write('*' + node.vararg)
         if node.kwarg is not None:
             write_comma()
-            self.write('**' + node.kwarg)
+            self.write('**' + str(node.kwarg))
 
     def decorators(self, node):
         for decorator in node.decorator_list:
@@ -237,14 +237,6 @@ class AbstractSourceGenerator(ast.NodeVisitor):
                 paren_or_comma()
                 self.write(keyword.arg + '=')
                 self.visit(keyword.value)
-            if node.starargs is not None:
-                paren_or_comma()
-                self.write('*')
-                self.visit(node.starargs)
-            if node.kwargs is not None:
-                paren_or_comma()
-                self.write('**')
-                self.visit(node.kwargs)
         self.write(have_args and '):' or ':')
         self.body(node.body)
 
@@ -366,6 +358,7 @@ class AbstractSourceGenerator(ast.NodeVisitor):
 
     def visit_Call(self, node):
         want_comma = []
+
         def write_comma():
             if want_comma:
                 self.write(', ')
@@ -379,16 +372,12 @@ class AbstractSourceGenerator(ast.NodeVisitor):
             self.visit(arg)
         for keyword in node.keywords:
             write_comma()
-            self.write(keyword.arg + '=')
+            if keyword.arg is None:
+                self.write('**')
+            else:
+                self.write(keyword.arg + '=')
             self.visit(keyword.value)
-        if node.starargs is not None:
-            write_comma()
-            self.write('*')
-            self.visit(node.starargs)
-        if node.kwargs is not None:
-            write_comma()
-            self.write('**')
-            self.visit(node.kwargs)
+
         self.write(')')
 
     def visit_Name(self, node):
