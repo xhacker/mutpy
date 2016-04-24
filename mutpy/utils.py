@@ -68,7 +68,9 @@ class ModulesLoader:
     def is_package(self, name):
         try:
             module = importlib.import_module(name)
-            return module.__file__.endswith('__init__.py')
+            if hasattr(module, '__file__') and module.__file__.endswith('__init__.py'):
+                return True
+            return hasattr(module, '__path__')
         except ImportError:
             return False
         finally:
