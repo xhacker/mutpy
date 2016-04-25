@@ -110,6 +110,8 @@ class MutationController(views.ViewNotifier):
         return result, timer.stop()
 
     def get_test_suite(self, test_module, target_test):
+        # print(test_module)
+        # print(unittest.TestLoader().loadTestsFromModule(test_module))
         if target_test:
             return unittest.TestLoader().loadTestsFromName(target_test, test_module)
         else:
@@ -191,11 +193,15 @@ class MutationController(views.ViewNotifier):
 
     @utils.TimeRegister
     def run_tests_with_mutant(self, total_duration, mutant_module, mutations, coverage_result):
-        suite = self.create_test_suite(mutant_module)
-        if coverage_result:
-            self.mark_not_covered_tests_as_skip(mutations, coverage_result, suite)
         timer = utils.Timer()
-        result = self.run_mutation_test_runner(suite, total_duration)
+        try:
+            suite = self.create_test_suite(mutant_module)
+            if coverage_result:
+                self.mark_not_covered_tests_as_skip(mutations, coverage_result, suite)
+
+            result = self.run_mutation_test_runner(suite, total_duration)
+        except:
+            result = "killed"
         timer.stop()
         self.update_score_and_notify_views(result, timer.duration)
 
@@ -212,6 +218,8 @@ class MutationController(views.ViewNotifier):
     def update_score_and_notify_views(self, result, mutant_duration):
         if not result:
             self.update_timeout_mutant(mutant_duration)
+        elif result == "killed":
+            self.update_killed_mutant(result, mutant_duration)
         elif result.is_incompetent:
             self.update_incompetent_mutant(result, mutant_duration)
         elif result.is_survived:
@@ -232,7 +240,10 @@ class MutationController(views.ViewNotifier):
         self.score.inc_survived()
 
     def update_killed_mutant(self, result, duration):
-        self.notify_killed(duration, result.killer, result.exception_traceback, result.tests_run)
+        if result == "killed":
+            self.notify_killed(duration, "loader", ".", ".")
+        else:
+            self.notify_killed(duration, result.killer, result.exception_traceback, result.tests_run)
         self.score.inc_killed()
 
     def store_init_modules(self):

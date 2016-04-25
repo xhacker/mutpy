@@ -158,7 +158,7 @@ class AbstractSourceGenerator(ast.NodeVisitor):
                 self.visit(default)
         if node.vararg is not None:
             write_comma()
-            self.write('*' + node.vararg)
+            self.write('*' + str(node.vararg))
         if node.kwarg is not None:
             write_comma()
             self.write('**' + str(node.kwarg))
