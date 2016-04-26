@@ -158,10 +158,10 @@ class AbstractSourceGenerator(ast.NodeVisitor):
                 self.visit(default)
         if node.vararg is not None:
             write_comma()
-            self.write('*' + str(node.vararg))
+            self.write('*' + node.vararg.arg)
         if node.kwarg is not None:
             write_comma()
-            self.write('**' + str(node.kwarg))
+            self.write('**' + node.kwarg.arg)
 
     def decorators(self, node):
         for decorator in node.decorator_list:
